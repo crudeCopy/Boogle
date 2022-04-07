@@ -37,7 +37,7 @@ public class BoogleDict {
     this.words = new HashSet<String>();
     String currentWord;
     while(dictScan.hasNextLine()) {
-      currentWord = (String)dictScan.nextLine();
+      currentWord = (String)dictScan.nextLine().toUpperCase();
       if(currentWord.length() > 2) this.words.add(currentWord);
     }
 

@@ -15,9 +15,14 @@ public class Boogle{
   /**
   clear the screen
   **/
-  public static void cls() {
-    try{ /// TODO: provid for linux use??
-      new ProcessBuilder("cmd","/c","cls").inheritIO().start().waitFor();
+  public static void cls() {   
+    try{ 
+      final String os = System.getProperty("os.name");
+      if (os.contains("Windows")) {
+        new ProcessBuilder("cmd","/c","cls").inheritIO().start().waitFor();
+      } else {
+        new ProcessBuilder("clear").inheritIO().start().waitFor();
+      }
     } catch(Exception e) {
       return;
     }
@@ -40,13 +45,30 @@ public class Boogle{
     // scanner for user input
     Scanner sc = new Scanner(System.in);
 
+    // prompt user for which dict file to use
+    cls();
+    System.out.print(open + "\n\nDICTIONARY // (P)owerlanglist.txt, (E)cpricelist.txt, or (Y)awl.txt: ");
+    String answer = sc.next().toUpperCase();
+    if(answer.equals("P")) {
+      answer = "powerlanglist.txt";
+    } else if(answer.equals("E")) {
+      answer = "ecpricelist.txt";
+    } else if(answer.equals("Y")) {
+      answer = "yawl.txt";
+    } else {
+      System.out.println("Not a valid dictionary.");
+      sc.close();
+      return;
+    }
+    
+
     // prompt user for board size
-    System.out.print(open + "\n\n\nBOARD SIZE: ");
+    System.out.print("\n\nBOARD SIZE: ");
     int size = sc.nextInt();
 
     // inits
     board = new BoogleBoard(size,size);
-    BoogleDict yawl = new BoogleDict("yawl.txt");
+    BoogleDict yawl = new BoogleDict(answer);
 
     unguessed = new HashSet<String>(board.validWords(yawl));
     guessed = new HashSet<String>();
@@ -78,5 +100,7 @@ public class Boogle{
       double percentGuessed = (double)guessed.size()*100.0/(guessed.size()+wordsRemaining);
       System.out.println("GUESSED: " + percentGuessed + "%\nUNGUESSED: " + unguessed);
     }
+
+    sc.close();
   }
 }
