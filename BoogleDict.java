@@ -3,30 +3,27 @@
 // purpose : a class that will hold a word list to draw from
 
 import java.io.*;
-import java.util.Scanner;
-import java.util.Arrays;
+import java.util.*;
 
 public class BoogleDict {
 
   // member variables
-  private String [] words;
+  private HashSet<String> words;
 
   /**
-  BoogleDict "from array" constructor, assigns words a copy of the given array
-  @param words the source array
+  BoogleDict "from set" constructor, assigns words a copy of the given set
+  @param givenWords the source set
   **/
-  public BoogleDict(String [] words) {
-    this.words = Arrays.copyOf(words, words.length);
+  public BoogleDict(HashSet<String> givenWords) {
+    this.words = new HashSet<String>(givenWords);
   }
 
   /**
   BoogleDict "from file" constructor, populates words with those from fileName
   @param fileName the location of the dictionary file
-  @param length the number of words in the file
   **/
-  public BoogleDict(String fileName, int length) {
-
-    // open dictionary file
+  public BoogleDict(String fileName) {
+    // open dictionary file and scanner
     FileInputStream file = null;
     try {
       file = new FileInputStream(fileName);
@@ -34,105 +31,62 @@ public class BoogleDict {
       e.printStackTrace();
       return;
     }
-    Scanner dict = new Scanner(file);
+    Scanner dictScan = new Scanner(file);
 
-    this.words = new String[length];
-
-    // read
-    int wordIndex = 0;
-    String word;
-    while(wordIndex < length && dict.hasNextLine()) {
-      word = dict.nextLine();
-      words[wordIndex] = word;
-      wordIndex++;
+    // read file for words and put into set if it is longer than 2 letters
+    this.words = new HashSet<String>();
+    String currentWord;
+    while(dictScan.hasNextLine()) {
+      currentWord = (String)dictScan.nextLine();
+      if(currentWord.length() > 2) this.words.add(currentWord);
     }
 
     // close the FileReader
-    dict.close();
-  }
-
-  public BoogleDict wordsBeginningWith(String letter) {
-
-    // find indexes of start/end of words starting with letter
-    int start = 0, end = this.words.length - 1;
-    boolean stillGoing = true;
-
-    for(int i = 0; i < this.words.length && stillGoing; i++) {
-      if(this.words[i].indexOf(letter) == 0) {
-        start = i;
-        stillGoing = false;
-      }
-    }
-
-    stillGoing = true;
-    for(int i = this.words.length - 1; i >= start && stillGoing; i--) {
-      if(this.words[i].indexOf(letter) == 0) {
-        end = i + 1;
-        stillGoing = false;
-      }
-    }
-    if(stillGoing) {
-      end = start;
-    }
-
-    // return BoogleDict from subarray of this.words
-    return new BoogleDict(Arrays.copyOfRange(this.words, start, end));
+    dictScan.close();
   }
 
   /**
-  checks for an exact match in the dictionary, using binary search
-  @param word the word being checked for
+  finds any words that start with letter, returns them in a new BoogleDict
+  @param letter the letter grouping to find words starting with
+  **/
+  public BoogleDict wordsBeginningWith(String letter) {
+    HashSet<String> newWords = new HashSet<String>();
+
+    // iterate through this.words, add the ones that start with the given letter grouping
+    Iterator wordValues = this.words.iterator();
+    String currentWord;
+    while(wordValues.hasNext()) {
+      currentWord = (String)wordValues.next();
+      if(currentWord.indexOf(letter) == 0) newWords.add(currentWord);
+    }
+
+    return new BoogleDict(newWords);
+  }
+
+  /**
+  finds if there is an exact match for the given string in the dict, using HashSet.contains
+  @param word the word to look for
   **/
   public boolean contains(String word) {
-    int upper = this.words.length,
-        lower = 0,
-        middle;
-
-    while(upper >= lower) {
-      middle = (int) ((upper + lower) / 2);
-      // if less than
-      if(word.compareTo(this.words[middle]) < 0) {
-        upper = middle - 1;
-      // if greater than
-      } else if(word.compareTo(this.words[middle]) > 0) {
-        lower = middle + 1;
-      // if equal to
-      } else {
-        return true;
-      }
-    }
-    return false;
+    return this.words.contains(word);
   }
 
   /**
-  accessor for individual words in the dictionary
-  @param i index of the word
-  **/
-  public String getWord(int i) {
-    return this.words[i];
-  }
-
-  /**
-  returns whether or not the BoogleDict is empty
+  returns the number of words in the dict
   **/
   public int getLength() {
     if(this.words == null) {
       return 0;
     }
-    return this.words.length;
+    return this.words.size();
   }
 
   /**
-  toString override. takes really long for big dictionaries, use at own risk
+  toString override
   **/
   @Override
   public String toString() {
-    String result = "";
-
-    for(String word : this.words) {
-      result += word + "\n";
-    }
-    return result;
+    return this.words.toString();
   }
 
 }

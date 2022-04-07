@@ -16,7 +16,7 @@ public class Boogle{
   clear the screen
   **/
   public static void cls() {
-    try{
+    try{ /// TODO: provid for linux use??
       new ProcessBuilder("cmd","/c","cls").inheritIO().start().waitFor();
     } catch(Exception e) {
       return;
@@ -34,17 +34,21 @@ public class Boogle{
     System.out.print("BOARD:\n" + board + "\n\nWords Remaining: " + wordsRemaining + "\n\nGuessed:\n" + guessed + "\n\n");
   }
 
+  ////////////////////////////////// MAIN FUNCTION ////////////////////////////////////////////
+
   public static void main(String [] args) {
+    // scanner for user input
     Scanner sc = new Scanner(System.in);
 
+    // prompt user for board size
     System.out.print(open + "\n\n\nBOARD SIZE: ");
     int size = sc.nextInt();
 
     // inits
     board = new BoogleBoard(size,size);
-    BoogleDict yawl = new BoogleDict("yawl.txt", 264061);
+    BoogleDict yawl = new BoogleDict("yawl.txt");
 
-    unguessed = board.validWords(yawl);
+    unguessed = new HashSet<String>(board.validWords(yawl));
     guessed = new HashSet<String>();
 
     // play loop

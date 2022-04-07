@@ -80,7 +80,6 @@ public class BoogleBoard {
         this.board[x][y] = new BoogleLetter(stringBoard[x][y]);
       }
     }
-
     this.assignAdjacents();
   }
 
@@ -93,60 +92,51 @@ public class BoogleBoard {
     return this.board[x][y];
   }
 
+
+
   /**
   helper for validWords that checks for words formed from one given letter
-  @param letter the BoogleLetter to begin with
+  @param currentLetter the BoogleLetter to begin with
+  @param used the BoogleLetters that have already been used
   @param nug the previously collected letter sequence
   @param dict the BoogleDict to search through
-  @param set the Set<String> to add the valid words to
+  @param validSet the set to add the valid words to
   **/
-  private void validWordsFromLetter(BoogleLetter letter, Set<BoogleLetter> used, String nug, BoogleDict dict, Set<String> set) {
-
-    // grab a BoogleDict of all valid words starting with this letter nugget
-    BoogleDict newDict = dict.wordsBeginningWith(nug + letter.toString());
-
-    // get a copy of the used dict, so that used letters from this branch aren't "used" in others
+  private void validWordsFromLetter(BoogleLetter currentLetter, HashSet<BoogleLetter> used, String nug, BoogleDict dict, HashSet<String> validSet) {
+    // make a copy of the used letter set so that used letters in this branch don't show as used in another
     HashSet<BoogleLetter> newUsed = new HashSet<BoogleLetter>(used);
 
-    // base case
-    if(newDict.getLength() <= 0) {
-      if(dict.contains(nug) && nug.length() > 2) {
-        set.add(nug);
-      }
-      return;
+    // add new letter to nug, if it isn't already used
+    if(newUsed.contains(currentLetter)) return;
+    nug += currentLetter.toString();
+    newUsed.add(currentLetter);
+
+    // get words beginning with current word nugget, return if there are none
+    BoogleDict newDict = dict.wordsBeginningWith(nug);
+    if(newDict.getLength() == 0) return;
+
+    // if the nug occurs exactly in the dict, add it to the set of valid words. either way, continue on to the adjacents
+    if(newDict.contains(nug)) {
+      validSet.add(nug);
     }
-
-    newUsed.add(letter);
-
-    // through adjacents
-    for(int i = 0; i < letter.getDegree(); i++) {
-      //System.out.println("   CHECKING " + nug + letter.toString() + letter.getAdjacent(i).toString() + " : " + newDict.getLength() + " results...");
-
-      // check if this BoogleLetter instance has been used before
-      if(!newUsed.contains(letter.getAdjacent(i))) {
-        /*if(newDict.contains(nug) && nug.length() > 2) {
-          set.add(nug);
-        }*/
-
-        this.validWordsFromLetter(letter.getAdjacent(i), newUsed, nug + letter.toString(), newDict, set);
-      }
-
+    for(int i = 0; i < currentLetter.getDegree(); i++) {
+      this.validWordsFromLetter(currentLetter.getAdjacent(i), newUsed, nug, newDict, validSet);
     }
   }
+
+
   /**
   method to calculate all possible words and return them as a Set<String>
   @param dict a descending-order-sorted BoogleDict to find words in
   **/
   public HashSet<String> validWords(BoogleDict dict) {
-    // make a really big string HashSet to hold the valid words
+    // make a string HashSet to hold the valid words
     HashSet<String> valid = new HashSet<String>();
 
     // iterate through every letter on the board
     for(int y = 0; y < this.height; y++) {
       for(int x = 0; x < this.width; x++) {
-
         this.validWordsFromLetter(this.board[x][y], new HashSet<BoogleLetter>(), "", dict, valid);
-
       }
     }
     return valid;
