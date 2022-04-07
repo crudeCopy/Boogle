@@ -13,3 +13,5 @@ The game draws its words from one of three dictionaries:
 The program will prompt you for the board size first. Given input N, a board of NxN pseudorandomly generated letters will be built, and the program will hereupon start finding all valid words on this board. When this is done, the board will be shown on the prompt window.
 
 From this point, you will be shown the number of unguessed words as well as the words you have already correctly guessed. If a word you guess is valid, the words remaining counter will go down and the word will be added to your list. Try to find all of the words on the board! If you can't, you can always guess "q" to quit and see what words you missed.
+
+Working Replit at: https://replit.com/@ckchango/Boogle .
