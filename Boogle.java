@@ -15,8 +15,8 @@ public class Boogle{
   /**
   clear the screen
   **/
-  public static void cls() {   
-    try{ 
+  public static void cls() {
+    try{
       final String os = System.getProperty("os.name");
       if (os.contains("Windows")) {
         new ProcessBuilder("cmd","/c","cls").inheritIO().start().waitFor();
@@ -60,7 +60,7 @@ public class Boogle{
       sc.close();
       return;
     }
-    
+
 
     // prompt user for board size
     System.out.print("\n\nBOARD SIZE: ");
@@ -100,6 +100,12 @@ public class Boogle{
       double percentGuessed = (double)guessed.size()*100.0/(guessed.size()+wordsRemaining);
       System.out.println("GUESSED: " + percentGuessed + "%\nUNGUESSED: " + unguessed);
     }
+
+    //play again option
+    System.out.print("Play again? (Y/N)");
+    String again = sc.next();
+
+    if(again.equals("y") || again.equals("Y")) main(new String[0]);    
 
     sc.close();
   }
